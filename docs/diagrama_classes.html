@@ -1,0 +1,127 @@
+﻿<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Diagrama de Classes UML</title>
+<style>body{font-family:Arial,sans-serif;margin:20px;} h1{font-size:18px;} #d{width:100%;}</style>
+</head><body>
+<h1>Editor de Desenho Vetorial - Diagrama de Classes UML</h1>
+<pre class="mermaid" id="d">
+classDiagram
+
+    class FormaGeometrica {
+        &lt;&lt;interface&gt;&gt;
+        +adicionarPonto(p: Ponto)
+        +getPontos() List~Ponto~
+        +calcularArea() double
+        +calcularPerimetro() double
+        +getCentroide() Ponto
+        +contemPonto(px, py) boolean
+        +transladar(dx, dy)
+        +escalar(fator)
+        +rotacionar(angulo)
+        +cisalhar(shx, shy)
+        +clonar() FormaGeometrica
+    }
+    class FormaBase {
+        &lt;&lt;abstract&gt;&gt;
+        -pontos: List~Ponto~
+        -corPreenchimentoHex: String
+        -corBordaHex: String
+        -espessuraBorda: double
+        -groupId: String
+    }
+    class Poligono {
+        +isValido() boolean
+        +moverVertice(i, x, y)
+    }
+    class Quadrado
+    class Hexagono
+    class Circulo {
+        -raio: double
+        +getCentro() Ponto
+        +getRaio() double
+    }
+    class Ponto {
+        -x: double
+        -y: double
+        +distancia(outro) double
+        +clonar() Ponto
+    }
+
+    FormaGeometrica &lt;|.. FormaBase
+    FormaBase &lt;|-- Poligono
+    FormaBase &lt;|-- Circulo
+    Poligono &lt;|-- Quadrado
+    Poligono &lt;|-- Hexagono
+    FormaBase o-- "*" Ponto
+
+    class Ferramenta {
+        &lt;&lt;interface&gt;&gt;
+        +getNome() String
+        +aoPressionarMouse(ctx, p)
+        +aoArrastarMouse(ctx, p)
+        +aoSoltarMouse(ctx, p)
+        +aoClicar(ctx, p)
+        +aoConcluir(ctx)
+        +aoCancelar(ctx)
+    }
+    class FerramentaDesenhar
+    class FerramentaSelecionar
+    class FerramentaTransformar
+    class FerramentaEditarVertice
+    Ferramenta &lt;|.. FerramentaDesenhar
+    Ferramenta &lt;|.. FerramentaSelecionar
+    Ferramenta &lt;|.. FerramentaTransformar
+    Ferramenta &lt;|.. FerramentaEditarVertice
+
+    class EditorContext {
+        -ferramentaAtual: Ferramenta
+        -formas: List~FormaGeometrica~
+        -selecionadas: List~FormaGeometrica~
+        -snapAtivo: boolean
+        +setFerramenta(f)
+        +adicionarForma(f)
+        +selecionar(f, adicionar)
+        +agrupar()
+        +duplicarSelecionadas()
+        +desfazer()
+        +refazer()
+    }
+    class HistoricoController {
+        -pilhaDesfazer: Deque~Memento~
+        -pilhaRefazer: Deque~Memento~
+        +registrarEstado(formas)
+        +desfazer(atual) List
+        +refazer(atual) List
+    }
+    class Memento {
+        -estado: List~FormaGeometrica~
+    }
+    class GerenciadorPersistencia {
+        &lt;&lt;utility&gt;&gt;
+        +salvar(arquivo, ctx)
+        +carregar(arquivo) Documento
+    }
+    EditorContext o-- Ferramenta
+    EditorContext o-- "*" FormaGeometrica
+    EditorContext *-- HistoricoController
+    HistoricoController *-- Memento
+    GerenciadorPersistencia ..&gt; EditorContext
+
+    class ContainerApp {
+        +start(stage)
+    }
+    class BarraLateralView
+    class PainelDesenho
+    ContainerApp *-- BarraLateralView
+    ContainerApp *-- PainelDesenho
+    ContainerApp --&gt; EditorContext
+    BarraLateralView --&gt; EditorContext
+    PainelDesenho --&gt; EditorContext
+
+</pre>
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs';
+mermaid.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'loose' });
+await mermaid.run({ querySelector: '.mermaid' });
+document.body.setAttribute('data-ready','1');
+</script>
+</body></html>
